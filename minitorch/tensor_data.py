@@ -16,6 +16,7 @@ MAX_DIMS = 32
 
 class IndexingError(RuntimeError):
     "Exception raised for indexing errors."
+
     pass
 
 
@@ -44,7 +45,7 @@ def index_to_position(index: Index, strides: Strides) -> int:
     """
 
     # TODO: Implement for Task 2.1.
-    raise NotImplementedError("Need to implement for Task 2.1")
+    return index.dot(strides)
 
 
 def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
@@ -61,7 +62,11 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
 
     """
     # TODO: Implement for Task 2.1.
-    raise NotImplementedError("Need to implement for Task 2.1")
+    div = int(prod(list(shape)))
+    for i in range(len(shape)):
+        div = div // shape[i]
+        out_index[i] = ordinal // div
+        ordinal = ordinal % div
 
 
 def broadcast_index(
@@ -84,7 +89,15 @@ def broadcast_index(
         None
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
+    for i in range(len(out_index) - 1, -1, -1):
+        if big_shape[i] == shape[i]:
+            out_index[i] = big_index[i]
+        elif shape[i] == 1:
+            out_index[i] = 0
+        else:
+            raise IndexingError(
+                f"Cannot broadcast {big_shape} and {shape} at index {i}"
+            )
 
 
 def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
@@ -102,7 +115,30 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
         IndexingError : if cannot broadcast
     """
     # TODO: Implement for Task 2.2.
-    raise NotImplementedError("Need to implement for Task 2.2")
+
+    if len(shape1) < len(shape2):
+        lshape = [1] * (len(shape2) - len(shape1)) + list(shape1)
+        hshape = list(shape2)
+    else:
+        lshape = list(shape1)
+        hshape = [1] * (len(shape1) - len(shape2)) + list(shape2)
+
+    out_shape = []
+    for i, ds in enumerate(zip(lshape, hshape)):
+        dl, dh = ds
+        if dl != dh:
+            if dl == 1:
+                out_shape.append(dh)
+            elif dh == 1:
+                out_shape.append(dl)
+            else:
+                raise IndexingError(
+                    f"Cannot broadcast {shape1} and {shape2} at index {i}"
+                )
+        else:
+            out_shape.append(dl)
+
+    return tuple(out_shape)
 
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
@@ -218,12 +254,16 @@ class TensorData:
         Returns:
             New `TensorData` with the same storage and a new dimension order.
         """
-        assert list(sorted(order)) == list(
-            range(len(self.shape))
-        ), f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
+        assert list(sorted(order)) == list(range(len(self.shape))), (
+            f"Must give a position to each dimension. Shape: {self.shape} Order: {order}"
+        )
 
         # TODO: Implement for Task 2.1.
-        raise NotImplementedError("Need to implement for Task 2.1")
+        return TensorData(
+            self._storage,
+            tuple(self.shape[i] for i in order),
+            tuple(self._strides[i] for i in order),
+        )
 
     def to_string(self) -> str:
         s = ""

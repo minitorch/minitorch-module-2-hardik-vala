@@ -2,6 +2,7 @@
 Be sure you have minitorch installed in you Virtual Env.
 >>> pip install -Ue .
 """
+
 import random
 
 import minitorch
@@ -10,7 +11,10 @@ import minitorch
 class Network(minitorch.Module):
     def __init__(self, hidden_layers):
         super().__init__()
-        raise NotImplementedError("Need to include this file from past assignment.")
+        # TODO: Implement for Task 1.5.
+        self.layer1 = Linear(2, hidden_layers)
+        self.layer2 = Linear(hidden_layers, hidden_layers)
+        self.layer3 = Linear(hidden_layers, 1)
 
     def forward(self, x):
         middle = [h.relu() for h in self.layer1.forward(x)]
@@ -19,7 +23,7 @@ class Network(minitorch.Module):
 
 
 class Linear(minitorch.Module):
-    def __init__(self, in_size, out_size):
+    def __init__(self, in_size, out_size):  # in_size = 2, out_size = hidden_layers
         super().__init__()
         self.weights = []
         self.bias = []
@@ -39,7 +43,15 @@ class Linear(minitorch.Module):
             )
 
     def forward(self, inputs):
-        raise NotImplementedError("Need to include this file from past assignment.")
+        # TODO: Implement for Task 1.5.
+        outputs = []
+        for i, b in enumerate(self.bias):
+            output = minitorch.Scalar(0.0)
+            for j, ws in enumerate(self.weights):
+                output += inputs[j] * ws[i].value
+            output += b.value
+            outputs.append(output)
+        return outputs
 
 
 def default_log_fn(epoch, total_loss, correct, losses):
@@ -84,13 +96,13 @@ class ScalarTrain:
                     prob = -out + 1.0
                     correct += 1 if out.data < 0.5 else 0
                 loss = -prob.log()
-                (loss / data.N).backward()
+                (loss / data.N).backward()  # Calculates the gradients
                 total_loss += loss.data
 
             losses.append(total_loss)
 
             # Update
-            optim.step()
+            optim.step()  # Applies the gradients to the parameters
 
             # Logging
             if epoch % 10 == 0 or epoch == max_epochs:
@@ -103,3 +115,21 @@ if __name__ == "__main__":
     RATE = 0.5
     data = minitorch.datasets["Simple"](PTS)
     ScalarTrain(HIDDEN).train(data, RATE)
+
+    # PTS = 50
+    # HIDDEN = 3
+    # RATE = 0.5
+    # data = minitorch.datasets["Diag"](PTS)
+    # ScalarTrain(HIDDEN).train(data, RATE)
+
+    # PTS = 50
+    # HIDDEN = 5
+    # RATE = 0.5
+    # data = minitorch.datasets["Split"](PTS)
+    # ScalarTrain(HIDDEN).train(data, RATE)
+
+    # PTS = 50
+    # HIDDEN = 10
+    # RATE = 0.5
+    # data = minitorch.datasets["Xor"](PTS)
+    # ScalarTrain(HIDDEN).train(data, RATE)
