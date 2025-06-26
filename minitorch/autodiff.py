@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Iterable, List, Tuple
+from typing import Any, Iterable, Tuple
 
 from typing_extensions import Protocol
 
@@ -22,7 +22,21 @@ def central_difference(f: Any, *vals: Any, arg: int = 0, epsilon: float = 1e-6) 
     Returns:
         An approximation of $f'_i(x_0, \ldots, x_{n-1})$
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    # TODO: Implement for Task 1.1.
+    if arg == 0:
+        return (f(vals[0] + epsilon, *vals[1:]) - f(vals[0] - epsilon, *vals[1:])) / (
+            2 * epsilon
+        )
+
+    if arg == len(vals) - 1:
+        return (
+            f(*vals[:-1], vals[-1] + epsilon) - f(*vals[:-1], vals[-1] - epsilon)
+        ) / (2 * epsilon)
+
+    return (
+        f(*vals[:arg], vals[arg] + epsilon, *vals[arg + 1 :])
+        - f(*vals[:arg], vals[arg] - epsilon, *vals[arg + 1 :])
+    ) / (2 * epsilon)
 
 
 variable_count = 1
@@ -60,7 +74,21 @@ def topological_sort(variable: Variable) -> Iterable[Variable]:
     Returns:
         Non-constant Variables in topological order starting from the right.
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    # TODO: Implement for Task 1.4.
+    topo = []
+    # visited = set()
+
+    def _topological_sort(var: Variable) -> None:
+        # if var.unique_id in visited:
+        #     return
+        # visited.add(var.unique_id)
+        if not var.is_constant():
+            for parent in var.parents:
+                _topological_sort(parent)
+        topo.append(var)
+
+    _topological_sort(variable)
+    return topo[::-1]
 
 
 def backpropagate(variable: Variable, deriv: Any) -> None:
@@ -74,7 +102,17 @@ def backpropagate(variable: Variable, deriv: Any) -> None:
 
     No return. Should write to its results to the derivative values of each leaf through `accumulate_derivative`.
     """
-    raise NotImplementedError("Need to include this file from past assignment.")
+    # Correct implementation for Task 1.4.
+    derivatives = {variable.unique_id: deriv}
+    for var in topological_sort(variable):
+        d_output = derivatives.get(var.unique_id, 0.0)
+        if var.is_leaf():
+            var.accumulate_derivative(d_output)
+        elif var.is_constant():
+            continue
+        else:
+            for parent, d_parent in var.chain_rule(d_output):
+                derivatives[parent.unique_id] = d_parent
 
 
 @dataclass

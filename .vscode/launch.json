@@ -1,0 +1,73 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+      {
+          "name": "Debug test_tensor_data.py::test_layout",
+          "type": "debugpy",
+          "request": "launch",
+          "module": "pytest",
+          "args": [
+              "tests/test_tensor_data.py::test_layout",
+              "-v",
+              "-s"
+          ],
+          "console": "integratedTerminal",
+          "justMyCode": false
+      },
+      {
+        "name": "Debug test_tensor_data.py::test_enumeration",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "pytest",
+        "args": [
+            "tests/test_tensor_data.py::test_enumeration",
+            "-v",
+            "-s"
+        ],
+        "console": "integratedTerminal",
+        "justMyCode": false
+    },
+    {
+      "name": "Debug test_tensor_data.py::test_permute",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+          "tests/test_tensor_data.py::test_permute",
+          "-v",
+          "-s"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Debug test_tensor.py::test_reduce_forward_one_dim",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+          "tests/test_tensor.py::test_reduce_forward_one_dim",
+          "-v",
+          "-s"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Debug test_tensor.py::test_grad_size",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+          "tests/test_tensor.py::test_grad_size",
+          "-v",
+          "-s"
+      ],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+  ]
+}
